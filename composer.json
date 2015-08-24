@@ -4,6 +4,7 @@
   "description": "Supercache bundle for Symfony",
   "keywords": [
     "cache",
+    "pages caching",
     "static cache",
     "supercache"
   ],
