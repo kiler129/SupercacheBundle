@@ -1,0 +1,28 @@
+services:
+  supercache.filesystem.finder:
+    class: noFlash\SupercacheBundle\Filesystem\Finder
+    arguments: [%supercache.cache_dir%, @logger]
+
+  supercache.listeners.kernel:
+    class: noFlash\SupercacheBundle\Listeners\KernelListener
+    arguments: [@supercache.filesystem.response_handler]
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: onResponse, priority: -2147483647 }
+
+  supercache.cache_manager:
+    class: noFlash\SupercacheBundle\DependencyInjection\CacheManager
+    arguments: [@supercache.filesystem.finder, %supercache.cache_dir%]
+
+  supercache.filesystem.response_handler:
+    class: noFlash\SupercacheBundle\Filesystem\ResponseHandler
+    arguments: [@supercache.cache_manager, @service_container]
+
+  supercache.command.cache_clearer:
+    class: noFlash\SupercacheBundle\Command\CacheClearer
+    arguments: [@supercache.cache_manager]
+    tags:
+      - { name: kernel.cache_clearer }
+
+  supercache.utils.htaccess_generator:
+    class: noFlash\SupercacheBundle\Utils\HtaccessGenerator
+    arguments: [@supercache.filesystem.finder]
