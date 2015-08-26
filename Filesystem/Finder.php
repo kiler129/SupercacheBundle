@@ -174,6 +174,11 @@ class Finder
                 }
 
             } else {
+
+                if (strpos($realPath, $this->cacheDir . '/.') === 0) { //Skip dot-files in root directory
+                    continue;
+                }
+
                 if ($safeDelete && !preg_match(self::CACHE_FILE_REGEX, $realPath)) {
                     throw new \RuntimeException('Finder found unknown file ' . $realPath . ' - this was not created by SupercacheBundle. To disable this error and delete all files anyway you can set $safeDelete flag to false.');
                 }
