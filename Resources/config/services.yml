@@ -10,7 +10,7 @@ services:
       - { name: kernel.event_listener, event: kernel.response, method: onResponse, priority: -2147483647 }
 
   supercache.cache_manager:
-    class: noFlash\SupercacheBundle\DependencyInjection\CacheManager
+    class: noFlash\SupercacheBundle\Cache\CacheManager
     arguments: [@supercache.filesystem.finder, %supercache.cache_dir%]
 
   supercache.filesystem.response_handler:

@@ -3,7 +3,7 @@
 namespace noFlash\SupercacheBundle\Command;
 
 
-use noFlash\SupercacheBundle\DependencyInjection\CacheManager;
+use noFlash\SupercacheBundle\Cache\CacheManager;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 /**

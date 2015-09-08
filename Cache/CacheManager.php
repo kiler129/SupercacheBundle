@@ -1,6 +1,6 @@
 <?php
 
-namespace noFlash\SupercacheBundle\DependencyInjection;
+namespace noFlash\SupercacheBundle\Cache;
 
 
 use noFlash\SupercacheBundle\Exceptions\FilesystemException;
@@ -12,6 +12,7 @@ use noFlash\SupercacheBundle\Filesystem\Finder;
  */
 class CacheManager
 {
+
     const UNCACHEABLE_ENVIRONMENT     = -6;
     const UNCACHEABLE_PRIVATE         = -5;
     const UNCACHEABLE_NO_STORE_POLICY = -4;
@@ -81,7 +82,7 @@ class CacheManager
      * @param null|string $parent Branch to start from. Eg. you can specify /sandbox and you'll get /sandbox,
      *     /sandbox/info but not /test or /test/sandbox.
      *
-     * @return array
+     * @return array[]
      */
     public function getEntriesList($parent = null)
     {
@@ -175,6 +176,11 @@ class CacheManager
     public function clear()
     {
         return $this->deleteEntryRecursive('/');
+    }
+
+    public function saveElement(CacheElement $element)
+    {
+
     }
 
     /**

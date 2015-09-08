@@ -2,7 +2,7 @@
 
 namespace noFlash\SupercacheBundle\Filesystem;
 
-use noFlash\SupercacheBundle\DependencyInjection\CacheManager;
+use noFlash\SupercacheBundle\Cache\CacheManager;
 use noFlash\SupercacheBundle\Exceptions\SecurityViolationException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
