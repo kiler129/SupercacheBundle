@@ -55,7 +55,7 @@ class Finder
      *
      * @param $path
      *
-     * @return string Unline realpath() this method never returns false.
+     * @return string Unlike realpath() this method never returns false.
      */
     private function unixRealpath($path)
     {
@@ -110,6 +110,32 @@ class Finder
         $files = new RegexIterator($ite, self::CACHE_FILE_REGEX);
 
         return $files;
+    }
+
+    /**
+     * Get cache file content.
+     *
+     * @param string $path
+     *
+     * @return string|false Will return file contents or false if cannot be retrieved.
+     * @throws PathNotFoundException
+     * @throws SecurityViolationException Thrown while path is not located under cache directory
+     * @throws \InvalidArgumentException Given path doesn't look like file created by this bundle
+     */
+    public function readFile($path)
+    {
+        try {
+            $path = $this->getAbsolutePathFromRelative($path);
+
+        } catch(PathNotFoundException $e) {
+            return false;
+        }
+
+        if (!preg_match(static::CACHE_FILE_REGEX, $path)) {
+            throw new \InvalidArgumentException("Finder can only read cache files - $path is not one of them");
+        }
+
+        return @file_get_contents($path);
     }
 
     /**

@@ -179,6 +179,48 @@ class CacheManager
     }
 
     /**
+     * Tries to retrieve element from cache by it's path.
+     *
+     * @param $path
+     * @param null|string $type Contents of CacheElement::TYPE_* or null to get any type
+     *
+     * @return CacheElement|null
+     */
+    public function getElement($path, $type = null)
+    {
+        if ($type === null) {
+            $basePath = $path . '/';
+
+            $content = $this->finder->readFile($basePath . '/index.' . CacheElement::TYPE_HTML);
+            if ($content !== false) {
+                return new CacheElement($path, $content, CacheElement::TYPE_HTML);
+            }
+
+            $content = $this->finder->readFile($basePath . '/index.' . CacheElement::TYPE_JAVASCRIPT);
+            if ($content !== false) {
+                return new CacheElement($path, $content, CacheElement::TYPE_JAVASCRIPT);
+            }
+
+            $content = $this->finder->readFile($basePath . '/index.' . CacheElement::TYPE_BINARY);
+            if ($content !== false) {
+                return new CacheElement($path, $content, CacheElement::TYPE_BINARY);
+            }
+
+        } else {
+            $element = new CacheElement($path, '', $type); //This will also verify type
+            $content = $this->finder->readFile($path . '/index.' . CacheElement::TYPE_BINARY);
+
+            if ($content !== false) {
+                $element->setContent($content);
+            }
+
+            return $element;
+        }
+
+        return null;
+    }
+
+    /**
      * Saves entry content. If entry exists it will be updated, otherwise created.
      *
      * @param CacheElement $element
