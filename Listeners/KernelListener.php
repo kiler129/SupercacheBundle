@@ -3,8 +3,10 @@
 namespace noFlash\SupercacheBundle\Listeners;
 
 
+use noFlash\SupercacheBundle\Cache\RequestHandler;
 use noFlash\SupercacheBundle\Cache\ResponseHandler;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Listens for Symfony HttpKernel events
@@ -14,16 +16,40 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 class KernelListener
 {
     /**
+     * @var RequestHandler
+     */
+    private $requestHandler;
+
+    /**
      * @var ResponseHandler
      */
     private $responseHandler;
 
     /**
-     * @param \noFlash\SupercacheBundle\Cache\ResponseHandler $responseHandler
+     * @param RequestHandler $requestHandler
+     * @param ResponseHandler $responseHandler
      */
-    public function __construct(ResponseHandler $responseHandler)
+    public function __construct(RequestHandler $requestHandler, ResponseHandler $responseHandler)
     {
+        $this->requestHandler = $requestHandler;
         $this->responseHandler = $responseHandler;
+    }
+
+    /**
+     * This method is executed on kernel.request event
+     *
+     * @param GetResponseEvent $event
+     *
+     * @see {http://symfony.com/doc/current/components/http_kernel/introduction.html#the-kernel-request-event}
+     */
+    public function onRequest(GetResponseEvent $event)
+    {
+        $request = $event->getRequest();
+        $cacheResponse = $this->requestHandler->retrieveCachedResponse($request);
+        if ($cacheResponse !== null) {
+            $request->attributes->set('response_source', 'cache');
+            $event->setResponse($cacheResponse);
+        }
     }
 
     /**
@@ -35,6 +61,13 @@ class KernelListener
      */
     public function onResponse(FilterResponseEvent $event)
     {
+        $request = $event->getRequest();
+        if ($request->attributes->get('response_source') === 'cache') {
+            $event->stopPropagation();
+
+            return;
+        }
+
         $this->responseHandler->cacheResponse($event->getRequest(), $event->getResponse());
     }
 }

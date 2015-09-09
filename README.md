@@ -36,7 +36,7 @@ Bundle can be installed like any other Symfony bundle.
   }
   ```
   3. ~~Execute following command and follow onscreen instructions `app/console supercache:install`~~
-  Currently manual installation is required. You should create `webcache` directory in root folder and than perform two steps described in **Troubleshooting** section below.
+  Currently manual installation is required. You should create `webcache` directory in root folder and than perform first two steps described in **Troubleshooting** section below.
 
 ## Configuration
 TBD
@@ -105,6 +105,12 @@ RewriteRule ^(.*) %{DOCUMENT_ROOT}/../webcache/$1/index.bin [L]
 ### <<<SUPERCACHE BUNDLE
 ```
 Please note cache path need to be adjusted. Path is relative to `web/` directory.
+
+### My server doesn't support .htaccess
+You have two options: translate rewrite rules (specified above) to format supported by server you use or use PHP-PULL mode.
+SupercacheBundle contains fallback mode for servers without .htaccess support (e.g. CLI server issued using `app/console server:run` command). This mode works by attaching to Symfony HTTP kernel and trying locate cached response for given request. Of course it comes with a price - fallback will run PHP intepretter and initialize core of the framework. In my tests DIRECT mode returns response in 3-5ms while PHP-PULL mode need around 30ms.
+
+There's no need to change any configuration options to enable PHP-PULL.
 
 ## FAQ
 #### Do all responses gets cached?

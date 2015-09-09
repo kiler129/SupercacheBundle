@@ -3,15 +3,20 @@ services:
     class: noFlash\SupercacheBundle\Filesystem\Finder
     arguments: [%supercache.cache_dir%, @logger]
 
-  supercache.listeners.kernel:
-    class: noFlash\SupercacheBundle\Listeners\KernelListener
-    arguments: [@supercache.cache.response_handler]
-    tags:
-      - { name: kernel.event_listener, event: kernel.response, method: onResponse, priority: -2147483647 }
-
   supercache.cache_manager:
     class: noFlash\SupercacheBundle\Cache\CacheManager
     arguments: [@supercache.filesystem.finder, %supercache.cache_dir%]
+
+  supercache.listeners.kernel:
+    class: noFlash\SupercacheBundle\Listeners\KernelListener
+    arguments: [@supercache.cache.request_handler, @supercache.cache.response_handler]
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 2147483647 }
+      - { name: kernel.event_listener, event: kernel.response, method: onResponse, priority: -2147483647 }
+
+  supercache.cache.request_handler:
+    class: noFlash\SupercacheBundle\Cache\RequestHandler
+    arguments: [@supercache.cache_manager, @service_container]
 
   supercache.cache.response_handler:
     class: noFlash\SupercacheBundle\Cache\ResponseHandler
