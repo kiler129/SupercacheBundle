@@ -45,10 +45,10 @@ Default configuration:
 supercache:
 
     # Enable/disable cache while running prod environment
-    enable_prod:          false
+    enable_prod:          true
 
     # Enable/disable cache while running dev environment
-    enable_dev:           true
+    enable_dev:           false
 
     # Cache directory, must be http-accessible (so it cannot be located under app/)
     cache_dir:            '%kernel.root_dir%/../webcache'

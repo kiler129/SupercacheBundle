@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Enable/disable cache while running prod environment')
                 ->end()
                 ->booleanNode('enable_dev')
-                    ->defaultTrue()
+                    ->defaultFalse()
                     ->info('Enable/disable cache while running dev environment')
                 ->end()
                 ->scalarNode('cache_dir')
