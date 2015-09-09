@@ -2,7 +2,6 @@
 
 namespace noFlash\SupercacheBundle\Cache;
 
-use noFlash\SupercacheBundle\Cache\CacheManager;
 use noFlash\SupercacheBundle\Exceptions\SecurityViolationException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,7 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResponseHandler
- * @package noFlash\SupercacheBundle\Filesystem
  */
 class ResponseHandler
 {
@@ -22,7 +20,9 @@ class ResponseHandler
     /**
      * @var bool
      */
+
     private $addStatusHeader;
+
     /**
      * @var CacheManager
      */
@@ -61,13 +61,41 @@ class ResponseHandler
             return false;
         }
 
-        $status = $this->cacheManager->saveEntry($request->getPathInfo(), $response->getContent());
+        $status = $this->cachePush($request->getPathInfo(), $response->getContent(),
+            $response->headers->get('Content-Type', 'application/octet-stream'));
 
         if ($this->addStatusHeader) {
-            $response->headers->set('X-Supercache', 'miss,' . (int)$status);
+            $response->headers->set('X-Supercache', 'MISS,' . (int)$status);
         }
 
         return (bool)$status;
+    }
+
+    /**
+     * Saves content to cache.
+     *
+     * @param string $path HTTP path.
+     * @param string $content Raw content to cache.
+     * @param string $contentType Response Content-Type. It can be just plain MIME type or like "text/html;
+     *     charset=UTF-8"
+     *
+     * @return bool
+     * @throws SecurityViolationException
+     */
+    private function cachePush($path, $content, $contentType)
+    {
+        //Guess cache type from mime. Basic rules were defined by https://github.com/kiler129/SupercacheBundle/issues/2
+        if (strpos($contentType, '/javascript') !== false || strpos($contentType, '/json') !== false) {
+            $type = CacheElement::TYPE_JAVASCRIPT;
+        } elseif (strpos($contentType, 'text/') !== false) {
+            $type = CacheElement::TYPE_HTML;
+        } else {
+            $type = CacheElement::TYPE_BINARY;
+        }
+
+        $element = new CacheElement($path, $content, $type);
+
+        return $this->cacheManager->saveElement($element);
     }
 
     /**

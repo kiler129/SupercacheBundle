@@ -178,33 +178,19 @@ class CacheManager
         return $this->deleteEntryRecursive('/');
     }
 
-    public function saveElement(CacheElement $element)
-    {
-
-    }
-
     /**
      * Saves entry content. If entry exists it will be updated, otherwise created.
      *
-     * @param string $path Cache path, eg. /sandbox
-     * @param string $content Content to save
+     * @param CacheElement $element
      *
      * @return bool
      * @throws FilesystemException
      * @throws SecurityViolationException Specified cache path was found to be dangerous (eg. /../../sandbox)
      */
-    public function saveEntry($path, $content)
+    public function saveElement(CacheElement $element)
     {
-        if (preg_match('/(\\|\/)\.\.(\\|\/)/', $path)) { //Don't look at me that way, please...
-            throw new SecurityViolationException("Requested path $path is invalid");
-        }
+        $path = $element->getPath() . '/index.' . $element->getType(); //Type contains extension
 
-        if (DIRECTORY_SEPARATOR !== '/') {
-            $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
-        }
-
-        $path .= DIRECTORY_SEPARATOR . 'index.html';
-
-        return $this->finder->writeFile($path, $content);
+        return $this->finder->writeFile($path, $element->getContent());
     }
 }

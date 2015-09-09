@@ -20,7 +20,7 @@ use SplFileInfo;
  */
 class Finder
 {
-    const CACHE_FILE_REGEX = '/index\.html$/';
+    const CACHE_FILE_REGEX = '/index\.(html|js|bin)$/';
 
     /**
      * @var string

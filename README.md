@@ -71,12 +71,18 @@ Options -ExecCGI
 </IfModule>
 
 <IfModule mod_headers.c>
-    Header set Cache-Control 'max-age=3, must-revalidate'
+    Header set Cache-Control 'max-age=3600, must-revalidate'
 </IfModule>
 
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/html A3
+    ExpiresByType text/html A3600
+</IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/html .html
+    AddType application/octet-stream .bin
 </IfModule>
 ```
 
@@ -84,10 +90,18 @@ Options -ExecCGI
 If you (or some other bundle) modified `web/.htaccess` file, installer may be have trouble automatically applying required changes. You can add following lines manually - they should be placed just below `RewriteRule ^app\.php(/(.*)|$) %{ENV:BASE}/$2 [R=301,L]` (or similar):
 ```apacheconf
 ### >>>SUPERCACHE BUNDLE 
-RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)
-RewriteCond %{QUERY_STRING} ^$
+RewriteCond %{REQUEST_METHOD} !^(GET|HEAD) [OR]
+RewriteCond %{QUERY_STRING} !^$
+RewriteRule . - [S=3]
+
 RewriteCond %{DOCUMENT_ROOT}/../webcache/$1/index.html -f
-RewriteRule ^(.*) ../webcache/$1/index.html [L]
+RewriteRule ^(.*) %{DOCUMENT_ROOT}/../webcache/$1/index.html [L]
+
+RewriteCond %{DOCUMENT_ROOT}/../webcache/$1/index.js -f
+RewriteRule ^(.*) %{DOCUMENT_ROOT}/../webcache/$1/index.js [L]
+
+RewriteCond %{DOCUMENT_ROOT}/../webcache/$1/index.bin -f
+RewriteRule ^(.*) %{DOCUMENT_ROOT}/../webcache/$1/index.bin [L]
 ### <<<SUPERCACHE BUNDLE
 ```
 Please note cache path need to be adjusted. Path is relative to `web/` directory.
@@ -102,8 +116,8 @@ No, request & response must meet some criteria to be cached:
 
 #### Are there any limitations?
 Yes, there are few:
-  * All cached files are served with `text/html` mime type
-  * `.htaccess` support must be turned on
+  * `.htaccess` support must be turned on (see issue #5 for details)
   * It's impossible to serve different content on `/sandbox` and `/sandbox/`
   * You cannot have routes `..` and `.` (they are illegal in HTTP RFC anyway)
   * There are no automatic check for authentication token (it's your responsibility to set `private` cache policy if you're presenting user-specific information)
+  * Due to performance reasons files are served from cache with one of the following MIME-Types: text/html, application/javascript or application/octet-stream. See issue #2 for details.

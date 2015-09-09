@@ -34,22 +34,28 @@ class HtaccessGenerator
     {
         //@formatter:off
         return static::HEADER .
-               "RemoveHandler .php\n" .
-               "RemoveType .php\n" .
-               "Options -ExecCGI\n" .
-               "\n" .
-               "<IfModule mod_php5.c>\n" .
-               "    php_flag engine off\n" .
-               "</IfModule>\n" .
-               "\n" .
-               "<IfModule mod_headers.c>\n" .
-               "    Header set Cache-Control 'max-age=3, must-revalidate'\n" .
-               "</IfModule>\n" .
-               "\n" .
-               "<IfModule mod_expires.c>\n" .
-               "    ExpiresActive On\n" .
-               "    ExpiresByType text/html A3\n" .
-               "</IfModule>\n" .
+               "RemoveHandler .php\n".
+               "RemoveType .php\n".
+               "Options -ExecCGI\n".
+               "\n".
+               "<IfModule mod_php5.c>\n".
+               "    php_flag engine off\n".
+               "</IfModule>\n".
+               "\n".
+               "<IfModule mod_headers.c>\n".
+               "    Header set Cache-Control 'max-age=3600, must-revalidate'\n".
+               "</IfModule>\n".
+               "\n".
+               "<IfModule mod_expires.c>\n".
+               "    ExpiresActive On\n".
+               "    ExpiresByType text/html A3600\n".
+               "</IfModule>\n".
+               "\n".
+               "<IfModule mod_mime.c>\n".
+               "    AddType application/javascript .js\n".
+               "    AddType text/html .html\n".
+               "    AddType application/octet-stream .bin\n".
+               "</IfModule>\n".
                static::FOOTER;
         //@formatter:on
     }
@@ -63,18 +69,21 @@ class HtaccessGenerator
     public function getWebCode()
     {
         $path = rtrim($this->finder->getRealCacheDir(), '/\\');
-        if (DIRECTORY_SEPARATOR !== '/') {
-            $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-        }
 
         //@formatter:off
         return static::HEADER .
-               "RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)\n" .
-               " RewriteCond %{QUERY_STRING} ^$\n" .
-               //" RewriteCond %{DOCUMENT_ROOT}/../webcache/$1/index.html -f \n".
-               //"RewriteRule ^(.*) ../webcache/$1/index.html [L]\n".
-               " RewriteCond $path/$1/index.html -f \n" .
-               "RewriteRule ^(.*) $path/$1/index.html [L]\n" .
+               "RewriteCond %{REQUEST_METHOD} !^(GET|HEAD) [OR]\n".
+               "RewriteCond %{QUERY_STRING} !^$\n".
+               "RewriteRule . - [S=3]\n".
+               "\n".
+               "RewriteCond $path/$1/index.html -f\n".
+               "RewriteRule ^(.*) $path/$1/index.html [L]\n".
+               "\n".
+               "RewriteCond $path/$1/index.js -f\n".
+               "RewriteRule ^(.*) $path/$1/index.js [L]\n".
+               "\n".
+               "RewriteCond $path/$1/index.bin -f\n".
+               "RewriteRule ^(.*) $path/$1/index.bin [L]\n".
                static::FOOTER;
         //@formatter:on
     }
