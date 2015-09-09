@@ -16,6 +16,7 @@ use SplFileInfo;
 
 /**
  * Handles all filesystem operations.
+ * This class always uses / (slash) as directory separator, however it accepts \.
  */
 class Finder
 {
@@ -39,7 +40,7 @@ class Finder
      */
     public function __construct($cacheDir, LoggerInterface $logger)
     {
-        $realCacheDir = realpath($cacheDir);
+        $realCacheDir = $this->unixRealpath($cacheDir);
 
         if (!$realCacheDir) {
             throw new FilesystemException("Supercache data directory $cacheDir is invalid or inaccessible");
@@ -47,6 +48,18 @@ class Finder
 
         $this->cacheDir = $realCacheDir;
         $this->logger = $logger;
+    }
+
+    /**
+     * Method works like realpath(), but it always return paths with slashes (while builtin one uses backslashes on Windos)
+     *
+     * @param $path
+     *
+     * @return string Unline realpath() this method never returns false.
+     */
+    private function unixRealpath($path)
+    {
+        return (DIRECTORY_SEPARATOR==='/') ? (string)realpath($path) : str_replace('\\', '/', realpath($path));
     }
 
     /**
@@ -70,7 +83,7 @@ class Finder
      */
     private function getAbsolutePathFromRelative($path)
     {
-        $absolute = realpath($this->cacheDir . DIRECTORY_SEPARATOR . $path);
+        $absolute = $this->unixRealpath($this->cacheDir . '/' . $path);
 
         if (empty($absolute)) {
             throw new PathNotFoundException($path, 'entry cannot be located inside supercache directory');
@@ -156,7 +169,7 @@ class Finder
     public function deleteDirectoryRecursive($path, $safeDelete = true)
     {
         $path = $this->getAbsolutePathFromRelative($path);
-        if ($path === false) {
+        if (empty($path)) {
             return false;
         }
 
@@ -166,7 +179,7 @@ class Finder
 
         /** @var SplFileInfo $fileInfo */
         foreach ($iterator as $fileInfo) {
-            $realPath = $fileInfo->getRealPath();
+            $realPath = $this->unixRealpath($fileInfo->getRealPath());
 
             if ($fileInfo->isDir()) {
                 if (@!rmdir($realPath)) {
@@ -174,8 +187,7 @@ class Finder
                 }
 
             } else {
-
-                if (strpos($realPath, $this->cacheDir . '/.') === 0) { //Skip dot-files in root directory
+                if (strpos($realPath, $this->cacheDir .  '/.') === 0) { //Skip dot-files in root directory
                     continue;
                 }
 
