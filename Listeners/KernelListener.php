@@ -3,7 +3,7 @@
 namespace noFlash\SupercacheBundle\Listeners;
 
 
-use noFlash\SupercacheBundle\Filesystem\ResponseHandler;
+use noFlash\SupercacheBundle\Cache\ResponseHandler;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
@@ -19,7 +19,7 @@ class KernelListener
     private $responseHandler;
 
     /**
-     * @param ResponseHandler $responseHandler
+     * @param \noFlash\SupercacheBundle\Cache\ResponseHandler $responseHandler
      */
     public function __construct(ResponseHandler $responseHandler)
     {

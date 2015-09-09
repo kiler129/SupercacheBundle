@@ -1,6 +1,6 @@
 <?php
 
-namespace noFlash\SupercacheBundle\Filesystem;
+namespace noFlash\SupercacheBundle\Cache;
 
 use noFlash\SupercacheBundle\Cache\CacheManager;
 use noFlash\SupercacheBundle\Exceptions\SecurityViolationException;

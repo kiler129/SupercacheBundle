@@ -5,7 +5,7 @@ services:
 
   supercache.listeners.kernel:
     class: noFlash\SupercacheBundle\Listeners\KernelListener
-    arguments: [@supercache.filesystem.response_handler]
+    arguments: [@supercache.cache.response_handler]
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: onResponse, priority: -2147483647 }
 
@@ -13,8 +13,8 @@ services:
     class: noFlash\SupercacheBundle\Cache\CacheManager
     arguments: [@supercache.filesystem.finder, %supercache.cache_dir%]
 
-  supercache.filesystem.response_handler:
-    class: noFlash\SupercacheBundle\Filesystem\ResponseHandler
+  supercache.cache.response_handler:
+    class: noFlash\SupercacheBundle\Cache\ResponseHandler
     arguments: [@supercache.cache_manager, @service_container]
 
   supercache.command.cache_clearer:
