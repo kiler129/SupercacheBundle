@@ -224,15 +224,19 @@ class Finder
      */
     public function writeFile($path, $content)
     {
-        $fullPath = $this->cacheDir . DIRECTORY_SEPARATOR . $path; //It may contain many directory separators
+        $fullPath = preg_replace('/(\/|\\\)+/','/', $this->cacheDir . '/' . $path); //Convert to absolute path with unix separators & remove duplicated slashed
+
+        if (preg_match('/\/\.\.|\.\.\//', $fullPath)) { //Don't look at me that way, please...
+            throw new SecurityViolationException("Requested path $path is invalid");
+        }
+
+        if (!preg_match(self::CACHE_FILE_REGEX, $fullPath)) {
+            throw new \InvalidArgumentException("Finder can only create cache files - $path is not one of them");
+        }
+
         $info = pathinfo($fullPath);
         if (!isset($info['dirname']) || (!is_dir($info['dirname']) && !mkdir($info['dirname'], 0777, true))) {
             throw new FilesystemException('Failed to create directory for ' . $path);
-        }
-
-        $fullPath = $info['dirname'] . DIRECTORY_SEPARATOR . $info['basename'];
-        if (!preg_match(self::CACHE_FILE_REGEX, $fullPath)) {
-            throw new \InvalidArgumentException("Finder can only create cache files - $path is not one of them");
         }
 
         if (file_put_contents($fullPath, $content) === false) {
@@ -242,21 +246,22 @@ class Finder
             return false;
         }
 
+        //Last verification to be 100% sure we did the right thing...
         try {
             $this->getAbsolutePathFromRelative($path);
 
             return true;
 
-        } catch(PathNotFoundException $e) {
+        } catch (\Exception $e) {
+            @unlink($fullPath); //Remove bogus file
+
             $this->logger->error("Cache file verification failed after write - file not found after writing to $fullPath (requested $path)");
 
+            if($e instanceof SecurityViolationException) {
+                $this->logger->error("Cache file verification failed after write - file not found after writing to $fullPath (requested $path)");
+            }
+
             return false;
-
-        } catch(SecurityViolationException $e) {
-            $this->logger->alert("SECURITY VIOLATION - requested write to $path which succeed, but path is above safe cache directory.");
-            @unlink($fullPath); //Try to repair mistake, it should stop anyone which manage to create cache file
-
-            throw $e;
         }
     }
 
