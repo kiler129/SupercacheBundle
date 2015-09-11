@@ -106,6 +106,10 @@ class ResponseHandler
      */
     public function isCacheable(Request $request, Response $response)
     {
+        if ($request->attributes->get('_supercache') === false) {
+            return CacheManager::UNCACHEABLE_ROUTE;
+        }
+
         if ($request->getMethod() !== 'GET') {
             return CacheManager::UNCACHEABLE_METHOD;
         }

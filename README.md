@@ -119,6 +119,8 @@ No, request & response must meet some criteria to be cached:
   * No query string
   * Response code between 200 and 300 (excluding 204)
   * No `private` or `no-store` cache control directives   
+  * Route is not marked as excluded (see #3 for details)
+
 
 #### Are there any limitations?
 Yes, there are few:
