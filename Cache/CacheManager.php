@@ -13,12 +13,13 @@ use noFlash\SupercacheBundle\Filesystem\Finder;
 class CacheManager
 {
 
-    const UNCACHEABLE_ENVIRONMENT     = -6;
-    const UNCACHEABLE_PRIVATE         = -5;
-    const UNCACHEABLE_NO_STORE_POLICY = -4;
-    const UNCACHEABLE_QUERY           = -3;
-    const UNCACHEABLE_CODE            = -2;
-    const UNCACHEABLE_METHOD          = -1;
+    const UNCACHEABLE_ENVIRONMENT     = -7;
+    const UNCACHEABLE_PRIVATE         = -6;
+    const UNCACHEABLE_NO_STORE_POLICY = -5;
+    const UNCACHEABLE_QUERY           = -4;
+    const UNCACHEABLE_CODE            = -3;
+    const UNCACHEABLE_METHOD          = -2;
+    const UNCACHEABLE_ROUTE           = -1;
 
     /**
      * @var array Human readable values for UNCACHEABLE_* codes
@@ -29,7 +30,8 @@ class CacheManager
         self::UNCACHEABLE_NO_STORE_POLICY => 'no-store-policy',
         self::UNCACHEABLE_QUERY => 'query-string',
         self::UNCACHEABLE_CODE => 'code',
-        self::UNCACHEABLE_METHOD => 'method'
+        self::UNCACHEABLE_METHOD => 'method',
+        self::UNCACHEABLE_ROUTE => 'route'
     );
 
     /**
