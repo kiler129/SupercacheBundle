@@ -124,8 +124,7 @@ No, request & response must meet some criteria to be cached:
 
 #### Are there any limitations?
 Yes, there are few:
-  * `.htaccess` support must be turned on (see issue #5 for details)
   * It's impossible to serve different content on `/sandbox` and `/sandbox/`
   * You cannot have routes `..` and `.` (they are illegal in HTTP RFC anyway)
   * There are no automatic check for authentication token (it's your responsibility to set `private` cache policy if you're presenting user-specific information)
-  * Due to performance reasons files are served from cache with one of the following MIME-Types: text/html, application/javascript or application/octet-stream. See issue #2 for details.
+  * Due to performance reasons files are served from cache with one of the following MIME-Types: text/html, application/javascript or application/octet-stream. See [issue #2](https://github.com/kiler129/SupercacheBundle/issues/2) for details.
