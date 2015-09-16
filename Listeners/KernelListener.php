@@ -62,10 +62,14 @@ class KernelListener
     public function onResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->attributes->get('response_source') === 'cache') {
+        if ($request->attributes->get('response_source') === 'cache') { //Prevents re-caching response from cache
             $event->stopPropagation();
 
             return;
+        }
+
+        if (!$event->isMasterRequest()) {
+            return; //Caching should only occur on master requests, see https://github.com/kiler129/SupercacheBundle/issues/10
         }
 
         $this->responseHandler->cacheResponse($event->getRequest(), $event->getResponse());
