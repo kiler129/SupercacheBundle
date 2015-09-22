@@ -44,7 +44,7 @@ class RequestHandler
      */
     public function retrieveCachedResponse(Request $request)
     {
-        if (!$this->isCacheable($request)) {
+        if ($this->isCacheable($request) !== true) {
             return null;
         }
 
