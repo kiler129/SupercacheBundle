@@ -53,9 +53,19 @@ class CacheElement
      *
      * @param string $path Cache path, eg. /sandbox
      */
-    public function setPath($path, $decode = true)
+    public function setPath($path)
     {
-        $this->path = $decode === true ? urldecode($path) : $path;
+        $this->path = urldecode($path);
+    }
+
+    /**
+     * Sets cached element path without url decoding
+     *
+     * @param string $path Cache path, eg. /sandbox
+     */
+    public function setRawPath($path)
+    {
+        $this->path = $path;
     }
 
     /**
