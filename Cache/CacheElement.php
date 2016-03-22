@@ -53,9 +53,9 @@ class CacheElement
      *
      * @param string $path Cache path, eg. /sandbox
      */
-    public function setPath($path)
+    public function setPath($path, $decode = true)
     {
-        $this->path = urldecode($path);
+        $this->path = $decode === true ? urldecode($path) : $path;
     }
 
     /**
