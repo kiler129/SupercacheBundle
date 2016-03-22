@@ -59,6 +59,16 @@ class CacheElement
     }
 
     /**
+     * Sets cached element path without url decoding
+     *
+     * @param string $path Cache path, eg. /sandbox
+     */
+    public function setRawPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
      * Provides cached element path
      *
      * @return string
