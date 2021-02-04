@@ -1,3 +1,11 @@
+# PROJECT ARCHIVED
+
+This project was born in a need for faster pages rendering years ago. Now, we have much better techniques (CDNs, HTTP/2, SPAs) to deal with the problem. The code should work with Symfony 2 & 3, but newer versions of Symfony would need an overhaul.
+
+This project is left here to stay for legacy apps still using it, as well as a historical piece.
+
+---
+
 # Supercache Bundle
 Static pages caching for Symfony Framework.
 
